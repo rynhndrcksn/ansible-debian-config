@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  become: true
+  vars_files:
+    - vault/secrets.yml
+  roles:
+    - initial-setup
+
+- import_playbook: webservers.yml
+
