@@ -1,0 +1,147 @@
+---
+
+- name: Disable SSH root login and password authentication
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart ssh
+
+- name: Create admin group if needed
+  group:
+    name: "{{ vault_admin_user }}"
+    state: present
+
+- name: Ensure secondary 'admin' group exists
+  group:
+    name: admin
+    state: present
+
+- name: Create admin user with sudo privileges
+  user:
+    name: "{{ vault_admin_user }}"
+    group: "{{ vault_admin_user }}"
+    groups: admin,sudo
+    append: yes
+    shell: /bin/bash
+    password: "{{ vault_admin_password }}"
+    create_home: yes
+    state: present
+  notify: expire password
+
+- name: Create ssh directory for admin user
+  file:
+    path: "/home/{{ vault_admin_user }}/.ssh"
+    state: directory
+    owner: "{{ vault_admin_user }}"
+    group: "{{ vault_admin_user }}"
+    mode: '0700'
+
+- name: Deploy authorized_keys for admin user
+  authorized_key:
+    user: "{{ vault_admin_user }}"
+    key: "{{ vault_admin_ssh_public_key }}"
+
+- name: Configure sudoers for admin user
+  copy:
+    dest: "/etc/sudoers.d/{{ vault_admin_user }}"
+    content: "{{ vault_admin_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Install fail2ban
+  apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+
+- name: Setup fail2ban jail.local
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fail2ban
+
+- name: Ensure fail2ban is running and enabled
+  systemd:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Install UFW firewall
+  apt:
+    name: ufw
+    state: present
+    update_cache: yes
+
+- name: Allow SSH port through UFW
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+
+- name: Enable UFW firewall
+  ufw:
+    state: enabled
+
+- name: Set timezone
+  timezone:
+    name: "UTC"
+
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Ensure Ansible remote_tmp directory exists with correct permissions
+  file:
+    path: /root/.ansible/tmp
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Ensure hostname is resolvable in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s+{{ hostname }}$'
+    line: "127.0.1.1 {{ hostname }}"
+    state: present
+    backup: yes
+
+- name: Install predetermined packages
+  apt:
+    name:
+      - btop
+      - vim
+      - curl
+      - git
+    state: present
+    update_cache: yes
+
+- name: Install unattended-upgrades and apt-listchanges
+  apt:
+    name:
+      - unattended-upgrades
+      - apt-listchanges
+    state: present
+    update_cache: yes
+
+- name: Configure unattended-upgrades
+  template:
+    src: 50unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable and start unattended-upgrades service
+  systemd:
+    name: unattended-upgrades
+    state: started
+    enabled: yes
+

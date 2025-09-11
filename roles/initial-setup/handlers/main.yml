@@ -1,0 +1,17 @@
+---
+
+- name: expire password
+  command: chage -d 0 "{{ vault_admin_user }}"
+
+- name: restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+    daemon_reload: yes
+
+- name: restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+    daemon_reload: yes
+
