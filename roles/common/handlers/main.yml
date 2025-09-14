@@ -16,5 +16,7 @@
     daemon_reload: yes
 
 - name: reload and restart apt timers
-  command: systemctl daemon-reload && systemctl restart apt-daily-upgrade.timer
+  shell: |
+    systemctl daemon-reload
+    systemctl restart apt-daily-upgrade.timer
 
