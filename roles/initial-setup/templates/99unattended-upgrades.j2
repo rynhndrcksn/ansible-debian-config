@@ -1,0 +1,11 @@
+# Unattended-upgrades configuration - managed by ansible template
+Unattended-Upgrade::Allowed-Origins {
+    "Debian stable";
+    "Debian ${distro_codename}-security";
+};
+
+Unattended-Upgrade::Automatic-Reboot "true";
+# Servers are set to UTC, so 0900 UTC = 0100/0200 PST depending on DST.
+Unattended-Upgrade::Automatic-Reboot-Time "09:00";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+

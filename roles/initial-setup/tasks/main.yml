@@ -133,8 +133,8 @@
 
 - name: Configure unattended-upgrades
   template:
-    src: 50unattended-upgrades.j2
-    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    src: 99unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/99unattended-upgrades
     owner: root
     group: root
     mode: '0644'
@@ -144,4 +144,21 @@
     name: unattended-upgrades
     state: started
     enabled: yes
+
+- name: Ensure apt-daily-upgrade systemd override directory exists
+  file:
+    path: /etc/systemd/system/apt-daily-upgrade.timer.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure upgrade schedule (systemd override for apt-daily-upgrade.timer)
+  template:
+    src: apt-daily-upgrade-override.conf.j2
+    dest: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload and restart apt timers
 
