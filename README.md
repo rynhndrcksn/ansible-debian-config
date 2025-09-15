@@ -21,6 +21,22 @@ The project includes roles and playbooks to:
 - **Playbooks:** Top-level orchestration scripts invoking roles and tasks
 - **Vault:** Secure storage of sensitive credentials and secrets
 
+## Dependencies
+
+This project has a `requirements.yml` file that outlines any extra/third-party modules that are required.
+These dependencies can be installed by running the following:
+
+```shell
+ansible-galaxy collection install -r requirements.yml
+```
+
+Note: installing Ansible via [Homebrew](https://formulae.brew.sh/formula/ansible#default) installs a lot of extra modules.
+You can check what modules you already have installed by running the following:
+
+```shell
+ansible-galaxy collection list
+```
+
 ## Features
 
 - Environment-aware configuration for staging, production, and more

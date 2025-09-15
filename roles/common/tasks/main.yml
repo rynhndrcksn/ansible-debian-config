@@ -80,13 +80,13 @@
     update_cache: yes
 
 - name: Allow SSH port through UFW
-  ufw:
+  community.general.ufw:
     rule: allow
     port: 22
     proto: tcp
 
 - name: Enable UFW firewall
-  ufw:
+  community.general.ufw:
     state: enabled
 
 - name: Set timezone

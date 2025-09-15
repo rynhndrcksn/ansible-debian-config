@@ -1,4 +1,24 @@
 ---
 
-- name: ping
-  ping:
+- name: Allow HTTP traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+  become: true
+
+- name: Allow HTTPS traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 443
+    proto: tcp
+
+- name: Allow HTTP/3 traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 443
+    proto: udp
+
+- name: Reload UFW to apply new rules
+  ansible.builtin.command: ufw reload
+
