@@ -1,0 +1,10 @@
+---
+
+- hosts: dbservers
+  become: true
+  vars_files:
+    - vault/secrets.yml
+  roles:
+    - common
+    - dbservers
+

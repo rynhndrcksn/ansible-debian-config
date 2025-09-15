@@ -5,7 +5,6 @@
     rule: allow
     port: 80
     proto: tcp
-  become: true
 
 - name: Allow HTTPS traffic in UFW
   community.general.ufw:
