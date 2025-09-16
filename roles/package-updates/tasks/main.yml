@@ -1,0 +1,52 @@
+---
+
+- name: Update all packages to latest version
+  apt:
+    upgrade: dist
+    update_cache: yes
+  register: upgrade_result
+
+- name: Autoremove unused packages
+  apt:
+    autoremove: yes
+  when: upgrade_result.changed
+
+- name: Autoclean apt cache
+  apt:
+    autoclean: yes
+  when: upgrade_result.changed
+
+- name: Ensure debian-goodies package is installed
+  apt:
+    name: debian-goodies
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Check for services requiring restart
+  command: checkrestart
+  register: restartcheck
+  changed_when: false
+  failed_when: false
+  args:
+    warn: false
+
+- name: Restart services if needed
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop: "{{ restartcheck.stdout_lines | default([]) }}"
+  when: restartcheck.stdout_lines is defined and (restartcheck.stdout_lines | length) > 0
+  become: true
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: Reboot server if required
+  reboot:
+    reboot_timeout: 600
+    test_command: whoami
+  when: reboot_required.stat.exists
+

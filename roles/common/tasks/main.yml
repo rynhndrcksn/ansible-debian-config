@@ -121,6 +121,7 @@
       - vim
       - curl
       - git
+      - debian-goodies
     state: present
     update_cache: yes
 
