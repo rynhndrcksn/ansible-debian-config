@@ -84,6 +84,7 @@
     rule: allow
     port: 22
     proto: tcp
+  notify: reload ufw
 
 - name: Enable UFW firewall
   community.general.ufw:

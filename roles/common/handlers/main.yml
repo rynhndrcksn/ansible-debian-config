@@ -9,6 +9,9 @@
     state: restarted
     daemon_reload: yes
 
+- name: reload ufw
+  ansible.builtin.command: ufw reload
+
 - name: restart fail2ban
   systemd:
     name: fail2ban
