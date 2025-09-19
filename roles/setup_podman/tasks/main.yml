@@ -1,0 +1,68 @@
+---
+
+- name: Create podman group if needed
+  ansible.builtin.group:
+    name: "podman"
+    state: present
+
+- name: Create podman user with sudo privileges
+  ansible.builtin.user:
+    name:  "podman"
+    group: "podman"
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    password: "{{ vault_podman_password }}"
+    create_home: true
+    state: present
+  notify: Expire password
+
+- name: Create ssh directory for podman user
+  ansible.builtin.file:
+    path: "/home/podman/.ssh"
+    state: directory
+    owner: "podman"
+    group: "podman"
+    mode: '0700'
+
+- name: Deploy authorized_keys for podman user
+  ansible.builtin.authorized_key:
+    user: "podman"
+    key: "{{ vault_admin_ssh_public_key }}"
+
+- name: Configure sudoers for podman user
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/podman"
+    content: "{{ vault_admin_user }} ALL=(ALL) ALL\n"
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Install Podman and dependencies
+  ansible.builtin.apt:
+    name: "{{ podman_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Get podman user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ podman_user }}"
+  register: podman_user_info
+
+- name: Configure /etc/containers/containers.conf for rootless podman
+  ansible.builtin.template:
+    src: containers.conf.j2
+    dest: /etc/containers/containers.conf
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    podman_user_info: "{{ podman_user_info }}"
+  notify: Reload podman services
+
+- name: Enable and start podman socket
+  ansible.builtin.systemd:
+    name: podman.socket
+    state: started
+    enabled: true

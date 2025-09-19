@@ -5,18 +5,18 @@
     rule: allow
     port: 80
     proto: tcp
-  notify: reload ufw
+  notify: Reload ufw
 
 - name: Allow HTTPS traffic in UFW
   community.general.ufw:
     rule: allow
     port: 443
     proto: tcp
-  notify: reload ufw
+  notify: Reload ufw
 
 - name: Allow HTTP/3 traffic in UFW
   community.general.ufw:
     rule: allow
     port: 443
     proto: udp
-  notify: reload ufw
+  notify: Reload ufw

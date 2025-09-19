@@ -7,7 +7,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart ssh
+  notify: Restart ssh
 
 - name: Create admin group if needed
   ansible.builtin.group:
@@ -29,7 +29,7 @@
     password: "{{ vault_admin_password }}"
     create_home: true
     state: present
-  notify: expire password
+  notify: Expire password
 
 - name: Create ssh directory for admin user
   ansible.builtin.file:
@@ -47,7 +47,7 @@
 - name: Configure sudoers for admin user
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ vault_admin_user }}"
-    content: "{{ vault_admin_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    content: "{{ vault_admin_user }} ALL=(ALL) ALL\n"
     owner: root
     group: root
     mode: '0440'
@@ -65,7 +65,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart fail2ban
+  notify: Restart fail2ban
 
 - name: Ensure fail2ban is running and enabled
   ansible.builtin.systemd:
@@ -84,7 +84,7 @@
     rule: allow
     port: 22
     proto: tcp
-  notify: reload ufw
+  notify: Reload ufw
 
 - name: Enable UFW firewall
   community.general.ufw:
@@ -162,4 +162,4 @@
     owner: root
     group: root
     mode: '0644'
-  notify: reload and restart apt timers
+  notify: Reload and restart apt timers
