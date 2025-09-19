@@ -1,7 +1,7 @@
 ---
 
 - name: Disable SSH root login and password authentication
-  template:
+  ansible.builtin.template:
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
     owner: root
@@ -10,17 +10,17 @@
   notify: restart ssh
 
 - name: Create admin group if needed
-  group:
+  ansible.builtin.group:
     name: "{{ vault_admin_user }}"
     state: present
 
 - name: Ensure secondary 'admin' group exists
-  group:
+  ansible.builtin.group:
     name: admin
     state: present
 
 - name: Create admin user with sudo privileges
-  user:
+  ansible.builtin.user:
     name: "{{ vault_admin_user }}"
     group: "{{ vault_admin_user }}"
     groups: admin,sudo
@@ -32,7 +32,7 @@
   notify: expire password
 
 - name: Create ssh directory for admin user
-  file:
+  ansible.builtin.file:
     path: "/home/{{ vault_admin_user }}/.ssh"
     state: directory
     owner: "{{ vault_admin_user }}"
@@ -40,12 +40,12 @@
     mode: '0700'
 
 - name: Deploy authorized_keys for admin user
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: "{{ vault_admin_user }}"
     key: "{{ vault_admin_ssh_public_key }}"
 
 - name: Configure sudoers for admin user
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ vault_admin_user }}"
     content: "{{ vault_admin_user }} ALL=(ALL) NOPASSWD:ALL\n"
     owner: root
@@ -53,13 +53,13 @@
     mode: '0440'
 
 - name: Install fail2ban
-  apt:
+  ansible.builtin.apt:
     name: fail2ban
     state: present
     update_cache: yes
 
 - name: Setup fail2ban jail.local
-  template:
+  ansible.builtin.template:
     src: jail.local.j2
     dest: /etc/fail2ban/jail.local
     owner: root
@@ -68,13 +68,13 @@
   notify: restart fail2ban
 
 - name: Ensure fail2ban is running and enabled
-  systemd:
+  ansible.builtin.systemd:
     name: fail2ban
     state: started
     enabled: yes
 
 - name: Install UFW firewall
-  apt:
+  ansible.builtin.apt:
     name: ufw
     state: present
     update_cache: yes
@@ -91,15 +91,15 @@
     state: enabled
 
 - name: Set timezone
-  timezone:
+  ansible.builtin.timezone:
     name: "UTC"
 
 - name: Set hostname
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ hostname }}"
 
 - name: Ensure Ansible remote_tmp directory exists with correct permissions
-  file:
+  ansible.builtin.file:
     path: /root/.ansible/tmp
     state: directory
     owner: root
@@ -107,7 +107,7 @@
     mode: '0700'
 
 - name: Ensure hostname is resolvable in /etc/hosts
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: '^127\.0\.1\.1\s+{{ hostname }}$'
     line: "127.0.1.1 {{ hostname }}"
@@ -115,7 +115,7 @@
     backup: yes
 
 - name: Install predetermined packages
-  apt:
+  ansible.builtin.apt:
     name:
       - btop
       - vim
@@ -126,7 +126,7 @@
     update_cache: yes
 
 - name: Install unattended-upgrades and apt-listchanges
-  apt:
+  ansible.builtin.apt:
     name:
       - unattended-upgrades
       - apt-listchanges
@@ -134,7 +134,7 @@
     update_cache: yes
 
 - name: Configure unattended-upgrades
-  template:
+  ansible.builtin.template:
     src: 99unattended-upgrades.j2
     dest: /etc/apt/apt.conf.d/99unattended-upgrades
     owner: root
@@ -142,13 +142,13 @@
     mode: '0644'
 
 - name: Enable and start unattended-upgrades service
-  systemd:
+  ansible.builtin.systemd:
     name: unattended-upgrades
     state: started
     enabled: yes
 
 - name: Ensure apt-daily-upgrade systemd override directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/apt-daily-upgrade.timer.d
     state: directory
     owner: root
@@ -156,7 +156,7 @@
     mode: '0755'
 
 - name: Configure upgrade schedule (systemd override for apt-daily-upgrade.timer)
-  template:
+  ansible.builtin.template:
     src: apt-daily-upgrade-override.conf.j2
     dest: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
     owner: root

@@ -1,30 +1,30 @@
 ---
 
 - name: Update all packages to latest version
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
     update_cache: yes
   register: upgrade_result
 
 - name: Autoremove unused packages
-  apt:
+  ansible.builtin.apt:
     autoremove: yes
   when: upgrade_result.changed
 
 - name: Autoclean apt cache
-  apt:
+  ansible.builtin.apt:
     autoclean: yes
   when: upgrade_result.changed
 
 - name: Ensure debian-goodies package is installed
-  apt:
+  ansible.builtin.apt:
     name: debian-goodies
     state: present
     update_cache: yes
   become: true
 
 - name: Check for services requiring restart
-  command: checkrestart
+  ansible.builtin.command: checkrestart
   register: restartcheck
   changed_when: false
   failed_when: false
@@ -32,7 +32,7 @@
     warn: false
 
 - name: Restart services if needed
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: restarted
   loop: "{{ restartcheck.stdout_lines | default([]) }}"
@@ -40,12 +40,12 @@
   become: true
 
 - name: Check if reboot is required
-  stat:
+  ansible.builtin.stat:
     path: /var/run/reboot-required
   register: reboot_required
 
 - name: Reboot server if required
-  reboot:
+  ansible.builtin.reboot:
     reboot_timeout: 600
     test_command: whoami
   when: reboot_required.stat.exists
