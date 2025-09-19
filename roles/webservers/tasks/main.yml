@@ -20,4 +20,3 @@
     port: 443
     proto: udp
   notify: reload ufw
-

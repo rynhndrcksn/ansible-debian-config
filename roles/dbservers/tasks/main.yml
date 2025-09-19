@@ -6,4 +6,3 @@
     port: 5432
     proto: tcp
   notify: reload ufw
-

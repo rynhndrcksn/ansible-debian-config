@@ -1,25 +1,24 @@
 ---
 
-- name: expire password
+- name: Expire password
   ansible.builtin.command: chage -d 0 "{{ vault_admin_user }}"
 
-- name: restart ssh
+- name: Restart ssh
   ansible.builtin.systemd:
     name: ssh
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
 
-- name: reload ufw
+- name: Reload ufw
   ansible.builtin.command: ufw reload
 
-- name: restart fail2ban
+- name: Restart fail2ban
   ansible.builtin.systemd:
     name: fail2ban
-    state: restarted
-    daemon_reload: yes
+    state: reloaded
+    daemon_reload: true
 
-- name: reload and restart apt timers
+- name: Reload and restart apt timers
   ansible.builtin.shell: |
     systemctl daemon-reload
     systemctl restart apt-daily-upgrade.timer
-

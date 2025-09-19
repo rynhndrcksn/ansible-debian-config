@@ -24,10 +24,10 @@
     name: "{{ vault_admin_user }}"
     group: "{{ vault_admin_user }}"
     groups: admin,sudo
-    append: yes
+    append: true
     shell: /bin/bash
     password: "{{ vault_admin_password }}"
-    create_home: yes
+    create_home: true
     state: present
   notify: expire password
 
@@ -56,7 +56,7 @@
   ansible.builtin.apt:
     name: fail2ban
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Setup fail2ban jail.local
   ansible.builtin.template:
@@ -71,13 +71,13 @@
   ansible.builtin.systemd:
     name: fail2ban
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Install UFW firewall
   ansible.builtin.apt:
     name: ufw
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Allow SSH port through UFW
   community.general.ufw:
@@ -112,7 +112,7 @@
     regexp: '^127\.0\.1\.1\s+{{ hostname }}$'
     line: "127.0.1.1 {{ hostname }}"
     state: present
-    backup: yes
+    backup: true
 
 - name: Install predetermined packages
   ansible.builtin.apt:
@@ -123,7 +123,7 @@
       - git
       - debian-goodies
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install unattended-upgrades and apt-listchanges
   ansible.builtin.apt:
@@ -131,7 +131,7 @@
       - unattended-upgrades
       - apt-listchanges
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Configure unattended-upgrades
   ansible.builtin.template:
@@ -145,7 +145,7 @@
   ansible.builtin.systemd:
     name: unattended-upgrades
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Ensure apt-daily-upgrade systemd override directory exists
   ansible.builtin.file:
@@ -163,4 +163,3 @@
     group: root
     mode: '0644'
   notify: reload and restart apt timers
-

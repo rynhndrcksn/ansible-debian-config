@@ -3,24 +3,24 @@
 - name: Update all packages to latest version
   ansible.builtin.apt:
     upgrade: dist
-    update_cache: yes
+    update_cache: true
   register: upgrade_result
 
 - name: Autoremove unused packages
   ansible.builtin.apt:
-    autoremove: yes
+    autoremove: true
   when: upgrade_result.changed
 
 - name: Autoclean apt cache
   ansible.builtin.apt:
-    autoclean: yes
+    autoclean: true
   when: upgrade_result.changed
 
 - name: Ensure debian-goodies package is installed
   ansible.builtin.apt:
     name: debian-goodies
     state: present
-    update_cache: yes
+    update_cache: true
   become: true
 
 - name: Check for services requiring restart
@@ -49,4 +49,3 @@
     reboot_timeout: 600
     test_command: whoami
   when: reboot_required.stat.exists
-
