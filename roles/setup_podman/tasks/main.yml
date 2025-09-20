@@ -2,13 +2,13 @@
 
 - name: Create podman group if needed
   ansible.builtin.group:
-    name: "podman"
+    name: "{{ vault_podman_user }}"
     state: present
 
 - name: Create podman user with sudo privileges
   ansible.builtin.user:
-    name:  "podman"
-    group: "podman"
+    name:  "{{ vault_podman_user }}"
+    group: "{{ vault_podman_user }}"
     groups: sudo
     append: true
     shell: /bin/bash
@@ -19,20 +19,20 @@
 
 - name: Create ssh directory for podman user
   ansible.builtin.file:
-    path: "/home/podman/.ssh"
+    path: "/home/{{ vault_podman_user }}/.ssh"
     state: directory
-    owner: "podman"
-    group: "podman"
+    owner: "{{ vault_podman_user }}"
+    group: "{{ vault_podman_user }}"
     mode: '0700'
 
 - name: Deploy authorized_keys for podman user
   ansible.builtin.authorized_key:
-    user: "podman"
+    user: "{{ vault_podman_user }}"
     key: "{{ vault_admin_ssh_public_key }}"
 
 - name: Configure sudoers for podman user
   ansible.builtin.copy:
-    dest: "/etc/sudoers.d/podman"
+    dest: "/etc/sudoers.d/{{ vault_podman_user }}"
     content: "{{ vault_admin_user }} ALL=(ALL) ALL\n"
     owner: root
     group: root
@@ -44,10 +44,51 @@
     state: present
     update_cache: yes
 
+- name: Ensure /etc/subuid entry for podman user
+  ansible.builtin.lineinfile:
+    path: /etc/subuid
+    line: "{{ vault_podman_user }}:100000:65536"
+    create: yes
+    state: present
+    validate: 'cat %s'
+
+- name: Ensure /etc/subgid entry for podman user
+  ansible.builtin.lineinfile:
+    path: /etc/subgid
+    line: "{{ vault_podman_user }}:100000:65536"
+    create: yes
+    state: present
+    validate: 'cat %s'
+
+- name: Ensure Podman config directory exists
+  ansible.builtin.file:
+    path: "/home/{{ vault_podman_user }}/.config/containers"
+    state: directory
+    owner: "{{ vault_podman_user }}"
+    group: "{{ vault_podman_user }}"
+    mode: "0700"
+    recurse: true
+
+- name: Ensure Podman storage directory exists
+  ansible.builtin.file:
+    path: "/home/{{ vault_podman_user }}/.local/share/containers/storage"
+    state: directory
+    owner: "{{ vault_podman_user }}"
+    group: "{{ vault_podman_user }}"
+    mode: "0700"
+    recurse: true
+
+- name: Ensure seccomp.json symlink exists for Podman
+  ansible.builtin.file:
+    src: /usr/share/containers/seccomp.json
+    dest: /etc/containers/seccomp.json
+    state: link
+    force: true
+
 - name: Get podman user UID
   ansible.builtin.getent:
     database: passwd
-    key: "{{ podman_user }}"
+    key: "{{ vault_podman_user }}"
   register: podman_user_info
 
 - name: Configure /etc/containers/containers.conf for rootless podman
