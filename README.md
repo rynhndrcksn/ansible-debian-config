@@ -11,7 +11,8 @@ The project includes roles and playbooks to:
 - Manage users and permissions
 - Harden SSH and firewall settings
 - Install and update essential packages and software
-- Automate system updates and security patches
+- Automate system updates, security patches, and service restarts
+- Install and configure Podman for container management with rootless best practices
 - Configure system-level settings like timezone and hostname
 
 ## Structure
@@ -44,6 +45,8 @@ ansible-galaxy collection list
 - Automated security hardening including fail2ban and firewall configuration
 - User management with enforced password policies
 - Package and service management tailored for Debian-based systems
+- Automated system updates with service restarts and conditional reboots to keep servers up-to-date and secure
+- Podman installation and configuration for rootless container management, including user setup, and systemd integration
 
 ## Getting Started
 
@@ -55,7 +58,7 @@ ansible-galaxy collection list
 ## Requirements
 
 - Ansible 2.18+
-    - Note: this might work on older versions of Ansible, but it was developed using Ansible 2.18.
+  - Note: this might work on older versions of Ansible, but it was developed using Ansible 2.18.
 - Debian 13 or newer servers
 - Access with sufficient privileges to perform configuration changes
 
@@ -69,7 +72,5 @@ Copyright (c) 2025 Ryan Hendrickson. Released under the MIT License. See [LICENS
 
 ---
 
-This project is designed to be flexible and easily expandable to accommodate evolving operational needs. Contribution and customization are encouraged to fit specific deployment scenarios.
-
-For detailed usage, role descriptions, and examples, consult the documentation and inline comments within the project files.
+This project is designed to be flexible and easily expandable to accommodate evolving operational needs. Contribution and customization are encouraged to fit specific deployment scenarios. For detailed usage, role descriptions, and examples, consult the documentation and inline comments within the project files.
 
