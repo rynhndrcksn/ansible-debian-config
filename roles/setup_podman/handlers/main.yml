@@ -5,7 +5,5 @@
 
 - name: Reload podman services
   ansible.builtin.systemd:
-    name:
-      - podman.socket
-      - podman.service
+    name: podman.socket
     state: restarted

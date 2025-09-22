@@ -67,7 +67,6 @@
     owner: "{{ vault_podman_user }}"
     group: "{{ vault_podman_user }}"
     mode: "0700"
-    recurse: true
 
 - name: Ensure Podman storage directory exists
   ansible.builtin.file:
@@ -76,7 +75,6 @@
     owner: "{{ vault_podman_user }}"
     group: "{{ vault_podman_user }}"
     mode: "0700"
-    recurse: true
 
 - name: Ensure seccomp.json symlink exists for Podman
   ansible.builtin.file:
@@ -94,7 +92,7 @@
 - name: Configure /etc/containers/containers.conf for rootless podman
   ansible.builtin.template:
     src: containers.conf.j2
-    dest: /etc/containers/containers.conf
+    dest: /home/{{ vault_podman_user }}/.config/containers/containers.conf
     owner: root
     group: root
     mode: '0644'
