@@ -2,7 +2,7 @@
 [containers]
 rootless = true
 runtime = "crun"
-netns = "cni"
+netns = "private"
 seccomp_profile = "/etc/containers/seccomp.json"
 
 [storage]
@@ -12,7 +12,6 @@ graphroot = "/home/podman/.local/share/containers/storage"
 mount_program = "/usr/bin/fuse-overlayfs"
 
 [engine]
-network_cmd = "pasta"
 cgroup_manager = "cgroupfs"
 mount_flags = "nodev, noexec, nosuid"
 default_capabilities = [
@@ -27,6 +26,9 @@ default_capabilities = [
   "CAP_KILL",
   "CAP_AUDIT_WRITE"
 ]
+
+[network]
+default_rootless_network_cmd = "pasta"
 
 [registries]
 unqualified-search-registries = ["docker.io"]
