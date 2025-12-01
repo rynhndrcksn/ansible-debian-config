@@ -1,7 +1,0 @@
----
-caddy_user: {{ vault_podman_user }}
-caddy_group: {{ vault_podman_user }}
-caddy_image: caddy-custom
-caddy_config_dir: /srv/caddy
-caddy_service_name: caddy
-

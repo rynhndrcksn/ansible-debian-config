@@ -1,0 +1,26 @@
+---
+- name: Copy Caddy Dockerfile to build location
+  ansible.builtin.copy:
+    src: Dockerfile.caddy
+    dest: "{{ caddy_config_dir }}/Dockerfile.caddy"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    mode: 0644
+
+- name: Build custom Caddy image
+  community.docker.docker_image:
+    name: "{{ caddy_image }}"
+    source: build
+    build:
+      path: "{{ caddy_config_dir }}"
+      dockerfile: Dockerfile.caddy
+    state: present
+    register: caddy_image_build
+
+- name: Restart caddy service if image changed
+  ansible.builtin.systemd:
+    name: "{{ caddy_service_name }}.service"
+    state: restarted
+    daemon_reload: yes
+  when: caddy_image_build.changed
+

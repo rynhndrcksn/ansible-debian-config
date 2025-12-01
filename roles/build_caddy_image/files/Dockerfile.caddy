@@ -1,0 +1,31 @@
+# Stage 1: Build Caddy binary with required modules using xcaddy
+FROM caddy:builder-alpine AS builder
+
+# Install git and necessary tools (if not present)
+RUN apk add --no-cache git
+
+# Build Caddy with cache-handler and rate-limit plugins
+RUN xcaddy build \
+    --with github.com/caddyserver/cache-handler \
+    --with github.com/mholt/caddy-ratelimit
+
+# Stage 2: Create minimal runtime image
+FROM caddy:alpine
+
+# Copy the custom-built Caddy binary from builder
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+
+# Set up Caddy user for rootless operation (already present in caddy:alpine)
+# Ensure /data and /config directories exist for ACME storage and cache
+RUN mkdir -p /data /config && chown -R caddy:caddy /data /config
+
+# Expose ports 80 and 443
+EXPOSE 80 443
+
+# Use non-root user "caddy"
+USER caddy
+
+# Entry point and default command unchanged
+ENTRYPOINT ["/usr/bin/caddy"]
+CMD ["run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+

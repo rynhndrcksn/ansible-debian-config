@@ -1,14 +1,10 @@
 ---
 
-- name: Running webservers.yml
+- name: Running build_caddy_image.yml
   hosts: webservers
   become: true
   vars_files:
     - vault/secrets.yml
   roles:
-    - common
-    - webservers
-    - setup_podman
     - build_caddy_image
-    - caddy_systemd_socket
 
