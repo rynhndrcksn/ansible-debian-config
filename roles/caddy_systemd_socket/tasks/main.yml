@@ -1,0 +1,23 @@
+---
+- name: Create systemd socket unit for Caddy
+  ansible.builtin.template:
+    src: caddy.socket.j2
+    dest: /etc/systemd/system/{{ caddy_service_name }}.socket
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Enable and start caddy.socket
+
+- name: Create systemd service unit for Caddy
+  ansible.builtin.template:
+    src: caddy.service.j2
+    dest: /etc/systemd/system/{{ caddy_service_name }}.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Enable and start caddy.service
+
