@@ -1,5 +1,5 @@
 # Stage 1: Build Caddy binary with required modules using xcaddy
-FROM caddy:builder-alpine AS builder
+FROM docker.io/library/caddy:builder-alpine AS builder
 
 # Install git and necessary tools (if not present)
 RUN apk add --no-cache git
@@ -10,13 +10,15 @@ RUN xcaddy build \
     --with github.com/mholt/caddy-ratelimit
 
 # Stage 2: Create minimal runtime image
-FROM caddy:alpine
+FROM docker.io/library/caddy:alpine
+
+# Create caddy group and user
+RUN addgroup -S caddy && adduser -S -G caddy caddy
 
 # Copy the custom-built Caddy binary from builder
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-# Set up Caddy user for rootless operation (already present in caddy:alpine)
-# Ensure /data and /config directories exist for ACME storage and cache
+# Ensure directories exist and owned by caddy user
 RUN mkdir -p /data /config && chown -R caddy:caddy /data /config
 
 # Expose ports 80 and 443

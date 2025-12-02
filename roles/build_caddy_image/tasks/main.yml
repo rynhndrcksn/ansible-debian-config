@@ -1,4 +1,16 @@
 ---
+- name: Ensure caddy_config_dir exists with correct permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    mode: 0755
+  loop:
+    - "{{ caddy_config_dir }}"
+    - "{{ caddy_config_dir }}/config"
+    - "{{ caddy_config_dir }}/data"
+
 - name: Copy Caddy Dockerfile to build location
   ansible.builtin.copy:
     src: Dockerfile.caddy
@@ -7,20 +19,11 @@
     group: "{{ caddy_group }}"
     mode: 0644
 
-- name: Build custom Caddy image
-  community.docker.docker_image:
-    name: "{{ caddy_image }}"
-    source: build
-    build:
-      path: "{{ caddy_config_dir }}"
-      dockerfile: Dockerfile.caddy
-    state: present
-    register: caddy_image_build
-
-- name: Restart caddy service if image changed
-  ansible.builtin.systemd:
-    name: "{{ caddy_service_name }}.service"
-    state: restarted
-    daemon_reload: yes
-  when: caddy_image_build.changed
+- name: Copy build script to VPS
+  ansible.builtin.copy:
+    src: build_caddy_image.sh
+    dest: "{{ caddy_config_dir}}/build_caddy_image.sh"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_user }}"
+    mode: '0755'
 
