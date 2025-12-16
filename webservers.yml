@@ -9,6 +9,4 @@
     - common
     - webservers
     - setup_podman
-    - build_caddy_image
-    - caddy_systemd_socket
 
