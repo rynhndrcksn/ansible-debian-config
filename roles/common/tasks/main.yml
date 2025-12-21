@@ -29,7 +29,6 @@
     password: "{{ vault_admin_password }}"
     create_home: true
     state: present
-  notify: Expire password
 
 - name: Create ssh directory for admin user
   ansible.builtin.file:
@@ -118,10 +117,10 @@
   ansible.builtin.apt:
     name:
       - btop
-      - vim
       - curl
-      - git
       - debian-goodies
+      - git
+      - vim
     state: present
     update_cache: true
 

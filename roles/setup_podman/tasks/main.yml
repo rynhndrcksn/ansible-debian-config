@@ -15,7 +15,6 @@
     password: "{{ vault_podman_password }}"
     create_home: true
     state: present
-  notify: Expire password
 
 - name: Create ssh directory for podman user
   ansible.builtin.file:
@@ -40,7 +39,11 @@
 
 - name: Install Podman and dependencies
   ansible.builtin.apt:
-    name: "{{ podman_packages }}"
+    name:
+      - fuse-overlayfs  # overlay support for rootless podman
+      - passt           # network support for rootless podman
+      - podman
+      - uidmap          # user namespace mapping
     state: present
     update_cache: yes
 

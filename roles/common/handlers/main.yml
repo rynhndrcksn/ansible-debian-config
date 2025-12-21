@@ -1,8 +1,5 @@
 ---
 
-- name: Expire password
-  ansible.builtin.command: chage -d 0 "{{ vault_admin_user }}"
-
 - name: Restart ssh
   ansible.builtin.systemd:
     name: ssh

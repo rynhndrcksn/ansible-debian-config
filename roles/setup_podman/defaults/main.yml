@@ -1,8 +1,0 @@
----
-podman_user: podman
-podman_packages:
-  - podman
-  - passt           # network support for rootless podman
-  - fuse-overlayfs  # overlay support for rootless podman
-  - uidmap          # user namespace mapping
-

@@ -1,8 +1,5 @@
 ---
 
-- name: Expire password
-  ansible.builtin.command: chage -d 0 "podman"
-
 - name: Reload podman services
   ansible.builtin.systemd:
     name: podman.socket
