@@ -6,7 +6,6 @@
     port: 80
     proto: tcp
   notify: reload ufw
-  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
 
 - name: Allow HTTPS traffic in UFW
   community.general.ufw:
@@ -14,7 +13,6 @@
     port: 443
     proto: tcp
   notify: reload ufw
-  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
 
 - name: Allow HTTP/3 traffic in UFW
   community.general.ufw:
@@ -22,7 +20,6 @@
     port: 443
     proto: udp
   notify: reload ufw
-  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
 
 - name: Install required packages
   ansible.builtin.apt:
