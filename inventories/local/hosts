@@ -3,3 +3,6 @@
 [webservers]
 srv11.home.arpa
 
+[reverse_proxies]
+srv11.home.arpa
+
