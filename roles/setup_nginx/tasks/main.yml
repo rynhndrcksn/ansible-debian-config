@@ -56,3 +56,23 @@
     enabled: yes
     state: started
 
+- name: Ensure nginx scripts directory exists
+  ansible.builtin.file:
+    path: /srv/nginx
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Copy Nginx scripts to srv directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/srv/nginx/{{ item | basename }}"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - nginx-cert-renew.sh
+    - nginx-cert-setup.sh
+    - nginx-sites-active.sh
+
