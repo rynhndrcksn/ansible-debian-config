@@ -1,0 +1,10 @@
+---
+
+- name: reload ufw
+  ansible.builtin.command: ufw reload
+
+- name: restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+

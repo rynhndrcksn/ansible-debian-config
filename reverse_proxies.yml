@@ -6,6 +6,5 @@
   vars_files:
     - vault/secrets.yml
   roles:
-    - common
-    - setup_podman
+    - setup_nginx
 

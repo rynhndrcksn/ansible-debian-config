@@ -1,0 +1,58 @@
+---
+
+- name: Allow HTTP traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+  notify: reload ufw
+  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
+
+- name: Allow HTTPS traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 443
+    proto: tcp
+  notify: reload ufw
+  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
+
+- name: Allow HTTP/3 traffic in UFW
+  community.general.ufw:
+    rule: allow
+    port: 443
+    proto: udp
+  notify: reload ufw
+  when: ansible_facts.service_mgr == "systemd" and "'ufw' in ansible_facts.packages"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - python3-certbot-nginx
+      - python3-certbot
+    state: present
+    update_cache: yes
+  notify: restart nginx
+
+- name: Ensure nginx cache directory exists
+  ansible.builtin.file:
+    path: /var/cache/nginx
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Ensure nginx log directory exists
+  ansible.builtin.file:
+    path: /var/log/nginx
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Enable and start nginx service
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: yes
+    state: started
+
