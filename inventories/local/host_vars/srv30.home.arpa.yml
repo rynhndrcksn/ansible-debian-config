@@ -1,0 +1,4 @@
+# Variables specific to srv30.home.arpa
+
+hostname: "srv30"
+

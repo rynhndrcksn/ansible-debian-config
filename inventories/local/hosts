@@ -2,7 +2,9 @@
 
 [webservers]
 srv11.home.arpa
+srv30.home.arpa
 
 [reverse_proxies]
 srv11.home.arpa
+srv30.home.arpa
 
