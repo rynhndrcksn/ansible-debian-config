@@ -47,6 +47,28 @@
     group: www-data
     mode: '0755'
 
+- name: Disable nginx default site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+
+- name: Deploy global HTTP to HTTPS redirect
+  ansible.builtin.copy:
+    src: http_to_https_redirect.conf
+    dest: /etc/nginx/sites-available/http_to_https_redirect
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart nginx
+
+- name: Enable global HTTP redirect site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/http_to_https_redirect
+    dest: /etc/nginx/sites-enabled/http_to_https_redirect
+    state: link
+  notify: restart nginx
+
 - name: Enable and start nginx service
   ansible.builtin.systemd:
     name: nginx
