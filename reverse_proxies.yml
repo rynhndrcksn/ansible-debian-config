@@ -1,7 +1,7 @@
 ---
 
-- name: Running webservers.yml
-  hosts: webservers
+- name: Running reverse_proxies.yml
+  hosts: reverse_proxies
   become: true
   vars_files:
     - vault/secrets.yml
