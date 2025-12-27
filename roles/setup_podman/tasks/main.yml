@@ -5,11 +5,16 @@
     name: "{{ vault_podman_user }}"
     state: present
 
+- name: Ensure secondary 'srvadmin' group exists
+  ansible.builtin.group:
+    name: srvadmin
+    state: present
+
 - name: Create podman user with sudo privileges
   ansible.builtin.user:
     name:  "{{ vault_podman_user }}"
     group: "{{ vault_podman_user }}"
-    groups: sudo
+    groups: srvadmin,sudo
     append: true
     shell: /bin/bash
     password: "{{ vault_podman_password }}"
