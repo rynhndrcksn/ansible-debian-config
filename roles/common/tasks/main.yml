@@ -19,11 +19,16 @@
     name: admin
     state: present
 
+- name: Ensure secondary 'srvadmin' group exists
+  ansible.builtin.group:
+    name: srvadmin
+    state: present
+
 - name: Create admin user with sudo privileges
   ansible.builtin.user:
     name: "{{ vault_admin_user }}"
     group: "{{ vault_admin_user }}"
-    groups: admin,sudo
+    groups: srvadmin,admin,sudo
     append: true
     shell: /bin/bash
     password: "{{ vault_admin_password }}"
@@ -50,6 +55,14 @@
     owner: root
     group: root
     mode: '0440'
+
+- name: Configure /srv directory permissions
+  ansible.builtin.file:
+    path: /srv
+    state: directory
+    owner: root
+    group: srvadmin
+    mode: '2775'
 
 - name: Install fail2ban
   ansible.builtin.apt:
