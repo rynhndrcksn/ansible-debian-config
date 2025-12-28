@@ -6,6 +6,7 @@ set -euo pipefail
 # Configuration
 SITES_AVAILABLE="/etc/nginx/sites-available"
 SITES_ENABLED="/etc/nginx/sites-enabled"
+CACHE_BASE_DIR="/var/cache/nginx"
 
 # Colors for output
 RED='\033[0;31m'
@@ -29,6 +30,7 @@ fi
 DOMAIN="$1"
 SOURCE="${SITES_AVAILABLE}/${DOMAIN}"
 TARGET="${SITES_ENABLED}/${DOMAIN}"
+CACHE_DIR="${CACHE_BASE_DIR}/${DOMAIN}"
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
@@ -49,7 +51,6 @@ if [ -L "$TARGET" ]; then
     EXISTING_TARGET=$(readlink -f "$TARGET")
     if [ "$EXISTING_TARGET" = "$SOURCE" ]; then
         echo -e "${YELLOW}Warning: Symlink already exists and points to correct location${NC}"
-        exit 0
     else
         echo -e "${YELLOW}Warning: Symlink exists but points to: ${EXISTING_TARGET}${NC}"
         read -p "Remove existing symlink and recreate? (y/N): " -n 1 -r
@@ -65,14 +66,33 @@ elif [ -e "$TARGET" ]; then
     exit 1
 fi
 
-# Create symlink
-if ln -s "$SOURCE" "$TARGET"; then
-    echo -e "${GREEN}✓ Successfully enabled site: ${DOMAIN}${NC}"
-    echo "  Source: $SOURCE"
-    echo "  Target: $TARGET"
+# Create cache directory if it doesn't exist
+if [ ! -d "$CACHE_DIR" ]; then
+    echo "Creating cache directory..."
+    if mkdir -p "$CACHE_DIR"; then
+        chown www-data:www-data "$CACHE_DIR"
+        chmod 0755 "$CACHE_DIR"
+        echo -e "${GREEN}✓ Created cache directory: ${CACHE_DIR}${NC}"
+    else
+        echo -e "${RED}Error: Failed to create cache directory${NC}"
+        exit 1
+    fi
 else
-    echo -e "${RED}Error: Failed to create symlink${NC}"
-    exit 1
+    echo -e "${GREEN}✓ Cache directory already exists: ${CACHE_DIR}${NC}"
+fi
+
+# Create symlink (skip if already correct)
+if [ -L "$TARGET" ]; then
+    echo -e "${GREEN}✓ Site already enabled: ${DOMAIN}${NC}"
+else
+    if ln -s "$SOURCE" "$TARGET"; then
+        echo -e "${GREEN}✓ Successfully enabled site: ${DOMAIN}${NC}"
+        echo "  Source: $SOURCE"
+        echo "  Target: $TARGET"
+    else
+        echo -e "${RED}Error: Failed to create symlink${NC}"
+        exit 1
+    fi
 fi
 
 # Test nginx configuration
