@@ -24,6 +24,8 @@
 - name: Install required packages
   ansible.builtin.apt:
     name:
+      - libnginx-mod-http-brotli-filter
+      - libnginx-mod-http-brotli-static
       - nginx
       - python3-certbot-nginx
       - python3-certbot
