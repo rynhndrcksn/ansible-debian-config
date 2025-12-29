@@ -133,6 +133,7 @@
       - curl
       - debian-goodies
       - git
+      - rsync
       - vim
     state: present
     update_cache: true
