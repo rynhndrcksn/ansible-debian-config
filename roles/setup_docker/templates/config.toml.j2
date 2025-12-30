@@ -1,0 +1,24 @@
+# Managed by Ansible.
+
+version = 2
+root = "/srv/containerd"
+state = "/run/containerd"
+
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.k8s.io/pause:3.9"
+
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+  runtime_type = "io.containerd.runc.v2"
+
+[plugins."io.containerd.snapshotter.v1.overlayfs"]
+  root = "/srv/containerd/io.containerd.snapshotter.v1.overlayfs"
+
+[plugins."io.containerd.content.v1.content"]
+  root = "/srv/containerd/io.containerd.content.v1.content"
+
+[plugins."io.containerd.image.v1.store"]
+  root = "/srv/containerd/io.containerd.image.v1.store"
+
+[plugins."io.containerd.metadata.v1.bolt"]
+  root = "/srv/containerd/io.containerd.metadata.v1.bolt"
+

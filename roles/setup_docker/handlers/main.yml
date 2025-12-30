@@ -1,7 +1,11 @@
 ---
 
-- name: Restart Docker
+- name: Restart containerd and Docker
   ansible.builtin.systemd:
-    name: docker
+    name: "{{ item }}"
     state: restarted
     enabled: true
+  loop:
+    - containerd
+    - docker
+
