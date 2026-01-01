@@ -8,4 +8,5 @@
   roles:
     - common
     - setup_docker
+    - open_web_ports
 
