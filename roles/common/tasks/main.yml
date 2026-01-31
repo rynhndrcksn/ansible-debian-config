@@ -9,11 +9,6 @@
     mode: '0644'
   notify: Restart ssh
 
-- name: Create admin group if needed
-  ansible.builtin.group:
-    name: "{{ vault_admin_user }}"
-    state: present
-
 - name: Ensure secondary 'admin' group exists
   ansible.builtin.group:
     name: admin
@@ -27,7 +22,6 @@
 - name: Create admin user with sudo privileges
   ansible.builtin.user:
     name: "{{ vault_admin_user }}"
-    group: "{{ vault_admin_user }}"
     groups: srvadmin,admin,sudo
     append: true
     shell: /bin/bash
