@@ -1,12 +1,12 @@
 ---
 
-- name: Running webservers.yml
-  hosts: webservers
+- hosts: webservers
   become: true
   vars_files:
     - vault/secrets.yml
   roles:
-    - common
-    - setup_docker
-    - open_web_ports
+    - { role: common, tags: ["common"] }
+    - { role: setup_docker, tags: ["docker", "containerization"] }
+    - { role: open_port_80, tags: ["firewall", "web"] }
+    - { role: open_port_443, tags: ["firewall", "web"] }
 

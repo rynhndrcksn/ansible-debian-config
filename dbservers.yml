@@ -1,12 +1,11 @@
 ---
 
-- name: Running dbserver.yml
-  hosts: dbservers
+- hosts: dbservers
   become: true
   vars_files:
     - vault/secrets.yml
   roles:
-    - common
-    - dbservers
-    - setup_docker
+    - { role: common, tags: ["common"] }
+    - { role: setup_docker, tags: ["docker", "containerization"] }
+    - { role: open_port_5432, tags: ["firewall", "web"] }
 

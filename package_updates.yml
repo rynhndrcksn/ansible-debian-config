@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  become: true
+  vars_files:
+    - vault/secrets.yml
+  roles:
+    - { role: package_updates, tags: ["updates"] }
+

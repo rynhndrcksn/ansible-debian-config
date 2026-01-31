@@ -1,9 +1,0 @@
----
-
-- name: Running package_update.yml
-  hosts: all
-  become: true
-  vars_files:
-    - vault/secrets.yml
-  roles:
-    - package-updates

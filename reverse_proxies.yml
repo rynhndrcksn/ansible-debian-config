@@ -1,9 +1,9 @@
 ---
 
-- name: Running reverse_proxies.yml
-  hosts: reverse_proxies
+- hosts: reverse_proxies
   become: true
   vars_files:
     - vault/secrets.yml
   roles:
+    - { role: setup_nginx, tags: ["nginx", "reverse-proxy"] }
 
