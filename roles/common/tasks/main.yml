@@ -1,5 +1,25 @@
 ---
 
+- name: Ensure Ansible remote_tmp directory exists with correct permissions
+  ansible.builtin.file:
+    path: /root/.ansible/tmp
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Install predetermined packages
+  ansible.builtin.apt:
+    name:
+      - btop
+      - curl
+      - debian-goodies
+      - git
+      - rsync
+      - vim
+    state: present
+    update_cache: true
+
 - name: Disable SSH root login and password authentication
   ansible.builtin.template:
     src: sshd_config.j2
@@ -102,35 +122,15 @@
 
 - name: Set hostname
   ansible.builtin.hostname:
-    name: "{{ hostname }}"
-
-- name: Ensure Ansible remote_tmp directory exists with correct permissions
-  ansible.builtin.file:
-    path: /root/.ansible/tmp
-    state: directory
-    owner: root
-    group: root
-    mode: '0700'
+    name: "{{ inventory_hostname }}"
 
 - name: Ensure hostname is resolvable in /etc/hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    regexp: '^127\.0\.1\.1\s+{{ hostname }}$'
-    line: "127.0.1.1 {{ hostname }}"
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ ([inventory_hostname] + (host_aliases | default([]))) | join(' ') }}"
     state: present
     backup: true
-
-- name: Install predetermined packages
-  ansible.builtin.apt:
-    name:
-      - btop
-      - curl
-      - debian-goodies
-      - git
-      - rsync
-      - vim
-    state: present
-    update_cache: true
 
 - name: Install unattended-upgrades and apt-listchanges
   ansible.builtin.apt:
@@ -170,3 +170,4 @@
     group: root
     mode: '0644'
   notify: Reload and restart apt timers
+
